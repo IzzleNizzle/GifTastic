@@ -3,17 +3,26 @@
 var topics = ["reckless", "effortless", "brisk", "stylish", "sloppy", "quick", "happy", "absentminded"];
 
 // Here we take the objects in the array, make buttons for each of them, and print them to the page
-for (i = 0; i < topics.length; i++) {
-    var topicButton = $("<button>");
-    topicButton.text(topics[i]);
-    topicButton.attr("data-name", topics[i]);
-    $("#animalButtons").append(topicButton);
+
+function printButtons() {
+    // First we empty the element
+    $("#animalButtons").empty();
+    // Then we use a for loop at the length of the array to print buttons for each item in the array.
+    for (i = 0; i < topics.length; i++) {
+        var topicButton = $("<button>");
+        topicButton.text(topics[i]);
+        topicButton.attr("data-name", topics[i]);
+        $("#animalButtons").append(topicButton);
+    }
+
 }
+
+
+
+function buttonClick (){
 
 // On click function for each of the buttons, grab 10 static non-animated gif images from the giphy api and place them on them on the page. Make sure to display ratings for every gif under the gif.
 $("button").on("click", function () {
-
-
 
     // Giphy API ajax
     var url = "https://api.giphy.com/v1/gifs/search";
@@ -30,7 +39,7 @@ $("button").on("click", function () {
 
         // Clears content before sending out more. This avoids the page getting very long when you push many different buttons or the same button repeatedly.
         $("#animals").empty();
-        for (i = 0; i < 10; i++) {
+        for (i = 0; i < response.data.length; i++) {
             // Create gif Images (10)
             var gifImages = $("<img>");
             gifImages.attr("id", "gif");
@@ -47,37 +56,59 @@ $("button").on("click", function () {
             $("#animals").append(gifImages);
             $("#animals").append(gifRating);
 
-
-
         }
 
-        // Logic here for when a user clicks the images that they will become animated and revert to still if clicked again
-        $("img").on("click", function () {
-            console.log("you clicked a img");
-            var state = $(this).attr("data-state");
-
-            if (state === "still") {
-                $(this).attr("src", $(this).attr("data-animate"));
-                $(this).attr("data-state", "animate");
-            } else {
-                $(this).attr("src", $(this).attr("data-still"));
-                $(this).attr("data-state", "still");
-            }
-        });
+        // Calling this function like this because in order for the $("img") to pull from images, the images have to be on the page before this function is called.
+        imageOnClick();
 
     });
-
-
-
-
 
 });
 
 
-$("img").on("click", function () {
-    console.log("something");
-})
+}
+
+// Gets buttons on the page initially
+printButtons();
+buttonClick();
+
+// Logic here for when a user clicks the images that they will become animated and revert to still if clicked again
+
+// Calling this function like this because in order for the $("img") to pull from images, the images have to be on the page before this function is called.
+function imageOnClick() {
+
+
+    $("img").on("click", function () {
+
+
+        var state = $(this).attr("data-state");
+
+        if (state === "still") {
+            $(this).attr("src", $(this).attr("data-animate"));
+            $(this).attr("data-state", "animate");
+        } else {
+            $(this).attr("src", $(this).attr("data-still"));
+            $(this).attr("data-state", "still");
+        }
+    });
+
+}
+
 
 
 // Create a function that captures input from the input form element and add it to the "topics" array. 
 // Then this same function remakes the buttons on the page including hte most recent one pushed to the array.
+
+// function for onclick when button is pressed
+$("#addAnimal").on("click", function () {
+
+    // This prevents page from resetting when submit is pushed
+    event.preventDefault();
+    // capture search input
+    var userInput = $("#animanl-input").val().trim();
+    // add input to array
+    topics.push(userInput);
+    // re display array
+    printButtons();
+    buttonClick();
+})
